@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotional Support Chatbot</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <div class="brand-icon"></div>
+                    <h1 class="brand-title">Emotional Support Chatbot</h1>
+                </div>
+                <p class="brand-tagline">A safe space to talk. Not a replacement for therapy.</p>
+            </div>
+
+            <div class="sidebar-card crisis-card">
+                <h3 class="card-title">Crisis Helplines</h3>
+                <div class="helpline-item">
+                    <span class="helpline-label">iCall</span>
+                    <a href="tel:9152987821" class="helpline-number">9152987821</a>
+                </div>
+                <div class="helpline-item">
+                    <span class="helpline-label">Vandrevala</span>
+                    <a href="tel:1860-2662-345" class="helpline-number">1860-2662-345</a>
+                </div>
+                <div class="helpline-item">
+                    <span class="helpline-label">AASRA</span>
+                    <a href="tel:9820466726" class="helpline-number">9820466726</a>
+                </div>
+            </div>
+
+            <div class="sidebar-card disclaimer-card">
+                <h3 class="card-title">About MindBot</h3>
+                <p class="card-text">This chatbot provides peer support only. Always seek professional help for serious concerns. MindBot is not a replacement for therapy or medical treatment.</p>
+            </div>
+
+            <div class="sidebar-principles">
+                <h3 class="card-title">Support Principles</h3>
+                <ul class="principles-list">
+                    <li>Private by default</li>
+                    <li>No judgment</li>
+                    <li>Encourages professional help</li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="chat-area">
+            <header class="chat-header">
+                <h2 class="header-title">Emotional Support Chatbot</h2>
+                <div class="emotion-badge" id="emotionBadge">Feeling: Neutral</div>
+            </header>
+
+            <section class="chat-intro">
+                <div class="intro-card">
+                    <p class="intro-text">Welcome. This is a confidential space where you can express yourself freely. How are you feeling today?</p>
+                    <div class="quick-actions">
+                        <button class="quick-action-btn" data-action="I feel stressed">I feel stressed</button>
+                        <button class="quick-action-btn" data-action="I feel low">I feel low</button>
+                        <button class="quick-action-btn" data-action="I feel anxious">I feel anxious</button>
+                        <button class="quick-action-btn" data-action="I feel okay">I feel okay</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="chat-messages" id="chatMessages"></section>
+
+            <form class="chat-input-area" id="chatForm">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="userInput" 
+                        class="message-input" 
+                        placeholder="How are you feeling today?"
+                        rows="1"
+                    ></textarea>
+                    <button 
+                        type="submit" 
+                        class="send-button" 
+                        id="sendBtn"
+                        aria-label="Send message"
+                    >
+                        <span class="send-icon">→</span>
+                    </button>
+                </div>
+                <p class="input-hint">Press Enter to send • Shift+Enter for new line</p>
+            </form>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
