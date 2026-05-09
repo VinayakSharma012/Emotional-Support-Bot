@@ -3,8 +3,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-FLASK_DEBUG = True
+FLASK_DEBUG = os.getenv("FLASK_DEBUG", "false").lower() == "true"
 FLASK_PORT = 8000
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "ALLOWED_ORIGINS",
+        "http://localhost:5000,http://localhost:8000,http://127.0.0.1:5000,http://127.0.0.1:8000,https://vinayaksharma012.github.io",
+    ).split(",")
+    if origin.strip()
+]
 
 FORBIDDEN_FRAGMENTS = [
     "you should take", "you should start", "you should stop", "you must take",

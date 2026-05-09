@@ -6,12 +6,12 @@ from flask_cors import CORS
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from config.config import FLASK_DEBUG, FLASK_PORT, ERROR_MISSING_MESSAGE_FIELD, ERROR_EMPTY_MESSAGE, ERROR_GENERIC
+from config.config import ALLOWED_ORIGINS, FLASK_DEBUG, FLASK_PORT, ERROR_MISSING_MESSAGE_FIELD, ERROR_EMPTY_MESSAGE, ERROR_GENERIC
 from backend.chat_handler import process_message
 
 frontend_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
 app = Flask(__name__, static_folder=frontend_path, static_url_path="")
-CORS(app)
+CORS(app, resources={r"/chat": {"origins": ALLOWED_ORIGINS}, r"/health": {"origins": ALLOWED_ORIGINS}})
 
 
 def get_timestamp():
