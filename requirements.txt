@@ -2,5 +2,4 @@ flask
 flask-cors
 python-dotenv
 textblob
-openai
 requests

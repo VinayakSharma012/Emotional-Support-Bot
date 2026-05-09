@@ -11,7 +11,6 @@ const emotionBadge = document.getElementById("emotionBadge");
 const chatForm = document.getElementById("chatForm");
 const quickActionBtns = document.querySelectorAll(".quick-action-btn");
 const chatState = {
-    lastEmotion: "neutral",
     lastReply: "",
     turnCount: 0,
 };
@@ -149,7 +148,6 @@ function getStaticReply(message) {
     }
 
     const reply = chooseStaticReply(text, emotion);
-    chatState.lastEmotion = emotion;
     chatState.lastReply = reply;
     chatState.turnCount += 1;
 

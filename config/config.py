@@ -23,12 +23,6 @@ FORBIDDEN_FRAGMENTS = [
     "prescrib", "drug", "therapy is", "treatment is", "cure for",
 ]
 
-ALLOWED_REPLY_ENDINGS = [
-    "I'm here if you want to talk more.",
-    "Would you like to tell me more?",
-    "Remember, speaking to a counselor can also help.",
-]
-
 POLARITY_POSITIVE_THRESHOLD = 0.1
 POLARITY_NEGATIVE_THRESHOLD = -0.05
 SUBJECTIVITY_DISTRESS_THRESHOLD = 0.55

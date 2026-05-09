@@ -33,5 +33,5 @@ def detect_emotion(message):
         else:
             return "neutral"
     
-    except Exception as e:
+    except Exception:
         return "neutral"

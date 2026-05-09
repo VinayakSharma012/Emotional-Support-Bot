@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from backend.safety import safety_check
 from backend.emotion import detect_emotion
-from backend.responses import get_fallback_response, get_context_aware_response
+from backend.responses import get_fallback_response
 from backend.sanitizer import sanitize_reply
 from config.config import HUGGINGFACE_MODEL
 
@@ -31,8 +31,6 @@ def process_message(user_message, history=None):
     
     # Step 3: Use Hugging Face with recent context, then safe fallbacks.
     reply = get_ai_response(user_message, emotion, history)
-    if not reply:
-        reply = get_context_aware_response(user_message, emotion)
     if not reply:
         reply = get_fallback_response(emotion)
     
@@ -79,7 +77,7 @@ def get_ai_response(message, emotion, history=None):
 
         return None
 
-    except Exception as e:
+    except Exception:
         return None
 
 

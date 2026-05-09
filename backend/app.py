@@ -77,7 +77,7 @@ def chat():
             "timestamp": get_timestamp(),
         }), 200
 
-    except Exception as e:
+    except Exception:
         return jsonify({
             "error": ERROR_GENERIC,
             "timestamp": get_timestamp(),

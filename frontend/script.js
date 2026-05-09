@@ -1,5 +1,5 @@
-const BACKEND_URL = "http://localhost:8000/chat";
-const WELCOME_MSG = "Hi! I'm your Emotional Support Chatbot. I'm here to listen. How are you feeling today? You can share anything — this is a safe, private space.";
+const BACKEND_URL = "/chat";
+const WELCOME_MSG = "Hi! I'm your Emotional Support Chatbot. I'm here to listen. How are you feeling today? You can share anything - this is a safe, private space.";
 
 const chatMessages = document.getElementById("chatMessages");
 const userInput = document.getElementById("userInput");

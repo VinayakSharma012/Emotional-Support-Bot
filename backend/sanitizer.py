@@ -3,7 +3,7 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from config.config import FORBIDDEN_FRAGMENTS, ALLOWED_REPLY_ENDINGS
+from config.config import FORBIDDEN_FRAGMENTS
 from backend.responses import get_fallback_response
 
 
@@ -20,10 +20,7 @@ def sanitize_reply(text):
 
     stripped = text.strip()
     
-    # Ensure response ends with one of the allowed endings
-    if not any(stripped.lower().endswith(e) for e in ALLOWED_REPLY_ENDINGS):
-        if not stripped.endswith(".") and not stripped.endswith("?"):
-            stripped += "."
-        stripped = f"{stripped} {ALLOWED_REPLY_ENDINGS[0]}"
+    if not stripped.endswith(".") and not stripped.endswith("?") and not stripped.endswith("!"):
+        stripped += "."
 
     return stripped
