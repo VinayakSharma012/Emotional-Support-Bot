@@ -11,6 +11,7 @@ Repository: https://github.com/VinayakSharma012/Emotional-Support-Bot
 - Crisis keyword detection with immediate helpline guidance
 - Emotion detection for positive, negative, neutral, and distressed messages
 - Supportive chatbot responses with a rule-based fallback
+- Hugging Face responses with recent conversation context when the backend is configured
 - Responsive HTML, CSS, and JavaScript interface
 - Flask backend for local API-powered chat
 - GitHub Pages deployment for the static frontend
@@ -20,6 +21,7 @@ Repository: https://github.com/VinayakSharma012/Emotional-Support-Bot
 - Frontend: HTML5, CSS3, vanilla JavaScript
 - Backend: Python Flask
 - Sentiment analysis: TextBlob
+- AI responses: Hugging Face Inference API
 - Deployment: GitHub Pages
 
 ## Project Structure
@@ -50,6 +52,14 @@ Install dependencies:
 pip install -r requirements.txt
 python -m textblob.download_corpora
 ```
+
+Optional: create a `.env` file for Hugging Face responses:
+
+```bash
+cp .env.example .env
+```
+
+Then set `HUGGINGFACE_API_KEY` in `.env`. Do not commit `.env`.
 
 Run the Flask backend:
 
@@ -102,7 +112,7 @@ The live GitHub Pages site is served from the `gh-pages` branch:
 
 https://vinayaksharma012.github.io/Emotional-Support-Bot/
 
-The `docs/` folder contains the static version of the app. Because GitHub Pages cannot run Flask, the hosted site uses static fallback responses unless a deployed backend URL is configured in `docs/script.js`.
+The `docs/` folder contains the static version of the app. Because GitHub Pages cannot run Flask, the hosted site uses static fallback responses unless a deployed backend URL is configured in `docs/script.js`. Hugging Face keys must stay on the backend, never in browser JavaScript.
 
 ## Crisis Resources
 

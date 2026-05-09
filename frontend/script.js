@@ -7,6 +7,7 @@ const sendBtn = document.getElementById("sendBtn");
 const emotionBadge = document.getElementById("emotionBadge");
 const chatForm = document.getElementById("chatForm");
 const quickActionBtns = document.querySelectorAll(".quick-action-btn");
+const conversationHistory = [];
 
 const isMobile = navigator.maxTouchPoints > 0 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
@@ -53,6 +54,7 @@ async function sendMessage() {
         return;
     }
 
+    const history = getRecentHistory();
     addUserMessage(message);
     userInput.value = "";
     resizeTextarea();
@@ -68,7 +70,7 @@ async function sendMessage() {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ message: message }),
+            body: JSON.stringify({ message: message, history: history }),
         });
 
         if (!response.ok) {
@@ -85,6 +87,7 @@ async function sendMessage() {
             addBotMessage(data.reply, data.timestamp);
         }
 
+        rememberConversation(message, data.reply);
         updateEmotionBadge(data.emotion);
     } catch (error) {
         console.error("Error:", error);
@@ -96,6 +99,19 @@ async function sendMessage() {
         sendBtn.disabled = false;
         sendBtn.classList.remove("loading");
         userInput.focus();
+    }
+}
+
+function getRecentHistory() {
+    return conversationHistory.slice(-8);
+}
+
+function rememberConversation(userMessage, botReply) {
+    conversationHistory.push({ role: "user", content: userMessage });
+    conversationHistory.push({ role: "bot", content: botReply });
+
+    if (conversationHistory.length > 16) {
+        conversationHistory.splice(0, conversationHistory.length - 16);
     }
 }
 
