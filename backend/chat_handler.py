@@ -14,18 +14,23 @@ HF_URL = f"https://api-inference.huggingface.co/models/{HUGGINGFACE_MODEL}"
 
 def process_message(user_message, history=None):
     history = history or []
+    
+    emotion = detect_emotion(user_message)
+    ai_response = get_ai_response(user_message, emotion, history)
+    
+    if ai_response:
+        crisis_intent = detect_crisis_intent(user_message)
+        if crisis_intent:
+            from backend.safety import CRISIS_RESPONSE
+            return {"reply": CRISIS_RESPONSE["reply"], "emotion": "distressed", "is_crisis": True}
+        reply = sanitize_reply(ai_response)
+        return {"reply": reply, "emotion": emotion, "is_crisis": False}
+    
     safety = safety_check(user_message)
     if safety["is_crisis"]:
         return {"reply": safety["reply"], "emotion": "distressed", "is_crisis": True}
     
-    emotion = detect_emotion(user_message)
-    crisis_intent = detect_crisis_intent(user_message)
-    if crisis_intent:
-        from backend.safety import CRISIS_RESPONSE
-        return {"reply": CRISIS_RESPONSE["reply"], "emotion": "distressed", "is_crisis": True}
-    
-    reply = get_context_aware_response(user_message, emotion) or get_ai_response(user_message, emotion, history)
-    reply = reply or get_fallback_response(emotion)
+    reply = get_context_aware_response(user_message, emotion) or get_fallback_response(emotion)
     reply = sanitize_reply(reply)
     return {"reply": reply, "emotion": emotion, "is_crisis": False}
 
