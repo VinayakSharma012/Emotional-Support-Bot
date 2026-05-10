@@ -1,9 +1,5 @@
-import sys
-import os
 from textblob import TextBlob
 from config.config import POLARITY_POSITIVE_THRESHOLD, POLARITY_NEGATIVE_THRESHOLD, SUBJECTIVITY_DISTRESS_THRESHOLD
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def detect_emotion(message):
     try:

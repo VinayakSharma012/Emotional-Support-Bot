@@ -1,9 +1,5 @@
-import sys
-import os
 from config.config import FORBIDDEN_FRAGMENTS
 from backend.responses import get_fallback_response
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def sanitize_reply(text):
     if not text or not text.strip():
