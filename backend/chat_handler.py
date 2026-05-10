@@ -53,7 +53,25 @@ def get_ai_response(msg, emotion, hist=None):
 
 def _build_prompt(msg, emotion, hist):
     conv = "\n".join([f"{'User' if i['role']=='user' else 'Assistant'}: {i['content']}" for i in hist[-8:]]) or "No previous messages."
-    return f"<|system|>\nYou are Emotional Support Chatbot, a warm emotional-support chatbot for students. Use conversation history to be contextual and avoid repetition. Validate feelings, ask one gentle follow-up, keep replies under 70 words. Don't diagnose, prescribe, or pretend to be a therapist. For crisis, encourage human help and helplines.\n<|user|>\nDetected emotion: {emotion}\nRecent conversation:\n{conv}\nLatest message: {msg}\n<|assistant|>\n"
+    return f"""<|system|>
+You are a compassionate emotional support chatbot. Your job is to:
+1. Listen and validate the user's feelings
+2. Show genuine understanding and empathy
+3. Ask clarifying questions to understand better
+4. Give practical, actionable advice when relevant
+5. Keep responses warm, conversational, and under 80 words
+6. Never pretend to be a therapist or doctor
+7. If user mentions crisis/harm, encourage professional help
+
+Context: User's detected emotion is {emotion}
+
+Recent conversation:
+{conv}
+
+Respond naturally, empathetically, and conversationally to the user's message.
+<|user|>
+{msg}
+<|assistant|>"""
 
 def _clean_reply(text):
     if not text:
@@ -69,7 +87,8 @@ def detect_crisis_intent(msg):
         return False
     try:
         headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
-        payload = {"inputs": f"Is this message expressing intent to harm themselves or others? '{msg}' Answer with 'yes' or 'no' only."}
+        prompt = f"Is the person expressing intent to harm themselves or commit suicide? Message: '{msg}'\n\nAnswer only 'yes' or 'no'."
+        payload = {"inputs": prompt}
         res = requests.post(HF_URL, headers=headers, json=payload, timeout=5)
         res.raise_for_status()
         result = res.json()
