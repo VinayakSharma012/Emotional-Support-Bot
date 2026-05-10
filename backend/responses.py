@@ -2,9 +2,9 @@ import random
 
 RESPONSES = {
     "positive": ["That's wonderful! What's been making you feel this way?", "I'm so glad you're in a good place! That's something to celebrate.", "That's amazing! It's great to see positivity.", "Your positive energy is beautiful. What's been bringing you joy?"],
-    "neutral": ["I hear you. Life has its ups and downs. What's on your mind?", "Thanks for opening up. What would help you feel better?", "It sounds like you're navigating through things. That takes courage.", "I'm listening. Sometimes we just need someone to talk to."],
-    "negative": ["I'm sorry you're going through a tough time. You're not alone. Would you like to talk?", "It sounds like things have been rough. Your feelings are valid. Tell me more?", "I can hear the struggle. You deserve support and I'm here. What's hurting?", "That sounds painful. You don't have to carry this alone. Tell me more?"],
-    "distressed": ["I'm genuinely concerned about what you're going through. Help is available. Tell me more?", "That sounds overwhelming. You deserve support.", "I hear so much in what you've shared. Your feelings matter deeply.", "I can sense you're really struggling. You deserve care."]
+    "neutral": ["I hear you. What's on your mind?", "Thanks for sharing. Tell me more about how you're feeling?", "It sounds like you're working through something. I'm here to listen.", "I'm listening. Sometimes we just need to talk it out."],
+    "negative": ["I'm sorry things feel tough right now. You're not alone—I'm here. Tell me more?", "That sounds difficult. Your feelings are valid. What's weighing on you?", "I can hear the struggle. You deserve support. Share what's on your mind?", "That sounds painful. You don't have to carry this alone. I'm here."],
+    "distressed": ["I'm genuinely concerned about what you've shared. Please reach out for support. Tell me more?", "That sounds overwhelming and scary. You deserve care and help. What's happening?", "I hear so much pain in what you've shared. You matter and you're not alone.", "I can sense you're really struggling. Professional support can help. Want to talk?"]
 }
 
 def get_fallback_response(emotion):
