@@ -32,12 +32,12 @@ def get_ai_response(msg, emotion, hist):
         return None
     try:
         res = requests.post(HF_URL, headers={"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}, 
-                          json={"inputs": _build_prompt(msg, emotion, hist), 
-                                "parameters": {"max_new_tokens": 100, "temperature": 0.7},
-                                "options": {"wait_for_model": True}}, timeout=30)
+                          json={"inputs": _build_prompt(msg, emotion, hist)}, timeout=30)
         res.raise_for_status()
         result = res.json()
-        return _clean_reply(result[0]["generated_text"]) if isinstance(result, list) and result and "generated_text" in result[0] else None
+        if isinstance(result, list) and result and "generated_text" in result[0]:
+            return _clean_reply(result[0]["generated_text"])
+        return None
     except:
         return None
 
