@@ -34,7 +34,7 @@ def get_ai_response(msg, emotion, hist):
         res = requests.post(HF_URL, headers={"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}, 
                           json={"inputs": _build_prompt(msg, emotion, hist), 
                                 "parameters": {"max_new_tokens": 100, "temperature": 0.7},
-                                "options": {"wait_for_model": False}}, timeout=8)
+                                "options": {"wait_for_model": True}}, timeout=30)
         res.raise_for_status()
         result = res.json()
         return _clean_reply(result[0]["generated_text"]) if isinstance(result, list) and result and "generated_text" in result[0] else None
@@ -67,7 +67,7 @@ def detect_crisis_intent(msg):
         return False
     try:
         res = requests.post(HF_URL, headers={"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}, 
-                          json={"inputs": f"Is the person expressing intent to harm themselves or commit suicide? Message: '{msg}'\n\nAnswer only 'yes' or 'no'."}, timeout=5)
+                          json={"inputs": f"Is the person expressing intent to harm themselves or commit suicide? Message: '{msg}'\n\nAnswer only 'yes' or 'no'."}, timeout=15)
         res.raise_for_status()
         result = res.json()
         return "yes" in (result[0]["generated_text"] if isinstance(result, list) and result else "").lower()
