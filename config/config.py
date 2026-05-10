@@ -6,6 +6,7 @@ load_dotenv()
 FLASK_DEBUG = os.getenv("FLASK_DEBUG", "false").lower() == "true"
 FLASK_PORT = 8000
 HUGGINGFACE_MODEL = os.getenv("HUGGINGFACE_MODEL", "google/flan-t5-base")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 MAX_HISTORY_MESSAGES = int(os.getenv("MAX_HISTORY_MESSAGES", "8"))
 ALLOWED_ORIGINS = [
     origin.strip()

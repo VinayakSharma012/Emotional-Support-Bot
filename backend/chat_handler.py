@@ -5,12 +5,12 @@ from backend.safety import safety_check, CRISIS_RESPONSE
 from backend.emotion import detect_emotion
 from backend.responses import get_fallback_response
 from backend.sanitizer import sanitize_reply
-from config.config import HUGGINGFACE_MODEL
+from config.config import GOOGLE_API_KEY
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY", "").strip()
-HF_URL = f"https://api-inference.huggingface.co/models/{HUGGINGFACE_MODEL}"
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "").strip()
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
 
 def process_message(user_message, history=None):
     emotion = detect_emotion(user_message)
@@ -28,15 +28,19 @@ def process_message(user_message, history=None):
     return {"reply": sanitize_reply(get_fallback_response(emotion)), "emotion": emotion, "is_crisis": False}
 
 def get_ai_response(msg, emotion, hist):
-    if not HUGGINGFACE_API_KEY:
+    if not GOOGLE_API_KEY:
         return None
     try:
-        res = requests.post(HF_URL, headers={"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}, 
-                          json={"inputs": _build_prompt(msg, emotion, hist)}, timeout=30)
+        res = requests.post(
+            f"{GEMINI_URL}?key={GOOGLE_API_KEY}",
+            json={"contents": [{"parts": [{"text": _build_prompt(msg, emotion, hist)}]}]},
+            timeout=30
+        )
         res.raise_for_status()
         result = res.json()
-        if isinstance(result, list) and result and "generated_text" in result[0]:
-            return _clean_reply(result[0]["generated_text"])
+        if "candidates" in result and result["candidates"]:
+            text = result["candidates"][0].get("content", {}).get("parts", [{}])[0].get("text", "")
+            return _clean_reply(text) if text else None
         return None
     except:
         return None
@@ -63,14 +67,18 @@ def _clean_reply(text):
     return cleaned.strip("\"' ")
 
 def detect_crisis_intent(msg):
-    if not HUGGINGFACE_API_KEY:
+    if not GOOGLE_API_KEY:
         return False
     try:
-        res = requests.post(HF_URL, headers={"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}, 
-                          json={"inputs": f"Is the person expressing intent to harm themselves or commit suicide? Message: '{msg}'\n\nAnswer only 'yes' or 'no'."}, timeout=15)
+        res = requests.post(
+            f"{GEMINI_URL}?key={GOOGLE_API_KEY}",
+            json={"contents": [{"parts": [{"text": f"Is the person expressing intent to harm themselves or commit suicide? Message: '{msg}'\n\nAnswer only 'yes' or 'no'."}]}]},
+            timeout=15
+        )
         res.raise_for_status()
         result = res.json()
-        return "yes" in (result[0]["generated_text"] if isinstance(result, list) and result else "").lower()
+        text = result.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "").lower()
+        return "yes" in text
     except:
         return False
 
