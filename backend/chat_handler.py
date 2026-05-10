@@ -53,7 +53,7 @@ def get_ai_response(msg, emotion, hist=None):
 
 def _build_prompt(msg, emotion, hist):
     conv = "\n".join([f"{'User' if i['role']=='user' else 'Assistant'}: {i['content']}" for i in hist[-8:]]) or "No previous messages."
-    return f"<|system|>\nYou are MindBot, a warm emotional-support chatbot for students. Use conversation history to be contextual and avoid repetition. Validate feelings, ask one gentle follow-up, keep replies under 70 words. Don't diagnose, prescribe, or pretend to be a therapist. For crisis, encourage human help and helplines.\n<|user|>\nDetected emotion: {emotion}\nRecent conversation:\n{conv}\nLatest message: {msg}\n<|assistant|>\n"
+    return f"<|system|>\nYou are Emotional Support Chatbot, a warm emotional-support chatbot for students. Use conversation history to be contextual and avoid repetition. Validate feelings, ask one gentle follow-up, keep replies under 70 words. Don't diagnose, prescribe, or pretend to be a therapist. For crisis, encourage human help and helplines.\n<|user|>\nDetected emotion: {emotion}\nRecent conversation:\n{conv}\nLatest message: {msg}\n<|assistant|>\n"
 
 def _clean_reply(text):
     if not text:

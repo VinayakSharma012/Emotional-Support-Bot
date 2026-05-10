@@ -1,4 +1,4 @@
-# Emotional Support Chatbot - MindBot
+# Emotional Support Chatbot
 
 A professional mental health support chatbot for students with crisis detection, emotion analysis, and empathetic responses.
 
