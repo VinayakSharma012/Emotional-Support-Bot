@@ -19,6 +19,11 @@ def process_message(user_message, history=None):
         return {"reply": safety["reply"], "emotion": "distressed", "is_crisis": True}
     
     emotion = detect_emotion(user_message)
+    crisis_intent = detect_crisis_intent(user_message)
+    if crisis_intent:
+        from backend.safety import CRISIS_RESPONSE
+        return {"reply": CRISIS_RESPONSE["reply"], "emotion": "distressed", "is_crisis": True}
+    
     reply = get_context_aware_response(user_message, emotion) or get_ai_response(user_message, emotion, history)
     reply = reply or get_fallback_response(emotion)
     reply = sanitize_reply(reply)
@@ -53,4 +58,18 @@ def _clean_reply(text):
         if marker in cleaned:
             cleaned = cleaned.split(marker, 1)[0].strip()
     return cleaned.strip("\"' ")
+
+def detect_crisis_intent(msg):
+    if not HUGGINGFACE_API_KEY:
+        return False
+    try:
+        headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
+        payload = {"inputs": f"Is this message expressing intent to harm themselves or others? '{msg}' Answer with 'yes' or 'no' only."}
+        res = requests.post(HF_URL, headers=headers, json=payload, timeout=5)
+        res.raise_for_status()
+        result = res.json()
+        response = result[0]["generated_text"] if result and isinstance(result, list) else ""
+        return "yes" in response.lower()
+    except Exception:
+        return False
 
