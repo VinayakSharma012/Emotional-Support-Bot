@@ -1,35 +1,37 @@
 import random
 
 RESPONSES = {
-    "positive": [
-        "That's wonderful to hear. What's been making you feel this way? I'm here if you want to share.",
-        "I'm so glad you're in a good place! That's something to celebrate. Would you like to tell me more?",
-        "That's amazing! It's great to see positivity. Remember, speaking to a counselor can also help sustain this.",
-        "Your positive energy is beautiful. What's been bringing you joy? I'm here to listen.",
-    ],
-    "neutral": [
-        "I hear you. Life has its ups and downs. What's on your mind? Would you like to talk about it?",
-        "Thanks for opening up. I'm here to listen without judgment. What would help you feel better?",
-        "It sounds like you're navigating through things. That takes courage. Would you like to share more?",
-        "I'm listening. Sometimes we just need someone to talk to. What's been happening lately?",
-    ],
-    "negative": [
-        "I'm sorry you're going through a tough time. That must be difficult. You're not alone in this. Would you like to talk?",
-        "It sounds like things have been rough. Your feelings are completely valid. I'm here for you. Tell me more?",
-        "I can hear the struggle in what you're saying. That's okay. You deserve support and I'm here. What's hurting?",
-        "That sounds painful. But I want you to know you don't have to carry this alone. I'm listening. Tell me more?",
-        "I hear you. Difficult emotions are part of being human. Remember, speaking to a counselor can really help.",
-    ],
-    "distressed": [
-        "I'm genuinely concerned about what you're going through. Please know you're not alone and help is available. Tell me more?",
-        "That sounds incredibly overwhelming and painful. You deserve real support. Please consider calling iCall: 9152987821.",
-        "I hear so much pain in what you've shared. Your feelings matter deeply. Would you like to talk more or need help?",
-        "I can sense you're really struggling. That's real, and you deserve care. A counselor can provide the support you need.",
-        "What you're experiencing sounds intensely difficult. Remember, you matter. Help is available: iCall 9152987821.",
-    ],
+    "positive": ["That's wonderful! What's been making you feel this way?", "I'm so glad you're in a good place! That's something to celebrate.", "That's amazing! It's great to see positivity.", "Your positive energy is beautiful. What's been bringing you joy?"],
+    "neutral": ["I hear you. Life has its ups and downs. What's on your mind?", "Thanks for opening up. What would help you feel better?", "It sounds like you're navigating through things. That takes courage.", "I'm listening. Sometimes we just need someone to talk to."],
+    "negative": ["I'm sorry you're going through a tough time. You're not alone. Would you like to talk?", "It sounds like things have been rough. Your feelings are valid. Tell me more?", "I can hear the struggle. You deserve support and I'm here. What's hurting?", "That sounds painful. You don't have to carry this alone. Tell me more?"],
+    "distressed": ["I'm genuinely concerned about what you're going through. Help is available. Tell me more?", "That sounds overwhelming. You deserve support.", "I hear so much in what you've shared. Your feelings matter deeply.", "I can sense you're really struggling. You deserve care."]
 }
 
 def get_fallback_response(emotion):
-    emotion = emotion.lower() if emotion else "neutral"
-    response_list = RESPONSES.get(emotion, RESPONSES["neutral"])
-    return random.choice(response_list)
+    emotion = (emotion or "neutral").lower()
+    return random.choice(RESPONSES.get(emotion, RESPONSES["neutral"]))
+
+CONTEXT = {
+    "crush": ("That sounds uplifting. What felt best about meeting them?", "It's meaningful to notice how people make us feel."),
+    "rejection": "I'm sorry you were treated that way. Would you like to tell me what happened?",
+    "anxiety": "I'm hearing worry. What thoughts are most on your mind?",
+    "exam": "Academic pressure can be heavy. What's causing the most stress?",
+    "hopeless": "I'm sorry you're feeling this way. Would you like to share more?"
+}
+
+def get_context_aware_response(msg, emotion=None):
+    if not msg:
+        return None
+    text = msg.lower()
+    if any(kw in text for kw in ("crush", "met", "date", "liked", "love", "she likes", "he likes")):
+        return CONTEXT["crush"][0] if any(w in text for w in ("happy", "glad", "excited")) else CONTEXT["crush"][1]
+    if any(kw in text for kw in ("treat me", "treats me", "mean to me", "rude", "insulted", "bully", "picked on")):
+        return CONTEXT["rejection"]
+    if any(kw in text for kw in ("anxious", "anxiety", "panic", "nervous", "worried", "worrying")):
+        return CONTEXT["anxiety"]
+    if any(kw in text for kw in ("exam", "test", "grade", "homework", "fail", "pressure", "study")):
+        return CONTEXT["exam"]
+    if any(kw in text for kw in ("give up", "no point", "hopeless", "can't go on", "done")):
+        return CONTEXT["hopeless"]
+    return None
+
