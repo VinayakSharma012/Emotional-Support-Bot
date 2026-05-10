@@ -61,6 +61,9 @@ def chat():
         return jsonify({"error": ERROR_GENERIC}), 500
 
 if __name__ == "__main__":
-    # Start the Flask server
-    app.run(debug=FLASK_DEBUG, port=FLASK_PORT)
+    app.run(
+        host="0.0.0.0",
+        port=FLASK_PORT,
+        debug=FLASK_DEBUG
+    )
 
