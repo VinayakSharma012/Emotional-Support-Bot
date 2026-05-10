@@ -1,10 +1,13 @@
 import os
+import sys
 import requests
 from backend.safety import safety_check, CRISIS_RESPONSE
 from backend.emotion import detect_emotion
 from backend.responses import get_fallback_response
 from backend.sanitizer import sanitize_reply
 from config.config import HUGGINGFACE_MODEL
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY", "").strip()
 HF_URL = f"https://api-inference.huggingface.co/models/{HUGGINGFACE_MODEL}"
