@@ -58,17 +58,16 @@ python -m textblob.download_corpora
 
 ### 2. Configure (Optional)
 
-For AI responses from Hugging Face:
+For AI responses using Google Gemini:
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` and add your Hugging Face API key:
+Edit `.env` and add your Google Gemini API key (get it free at [Google AI Studio](https://aistudio.google.com)):
 
 ```env
-HUGGINGFACE_API_KEY=your_api_key_here
-HUGGINGFACE_MODEL=HuggingFaceH4/zephyr-7b-beta
+GOOGLE_API_KEY=your_api_key_here
 ```
 
 **Note:** Keep `.env` private. It's in `.gitignore`.
@@ -133,9 +132,9 @@ The chatbot processes messages in this order:
 
 1. **Safety Check** → Detects crisis keywords, returns helpline info if needed
 2. **Emotion Detection** → Analyzes sentiment (positive/negative/neutral/distressed)
-3. **Context-Aware Response** → Checks for specific topics (exams, relationships, anxiety, etc.)
-4. **AI Response** → Uses Hugging Face if API key is configured
-5. **Fallback Response** → Safe, supportive default message
+3. **AI Response** → Uses Google Gemini 2.5 Flash API if key is configured
+4. **Crisis Intent Detection** → AI-based analysis for additional safety
+5. **Fallback Response** → Safe, supportive default message if AI fails
 6. **Sanitization** → Validates and formats the final reply
 
 ## Crisis Resources
@@ -163,9 +162,8 @@ All settings are in `config/config.py`:
 ```python
 FLASK_PORT = 8000                    # Server port
 FLASK_DEBUG = False                  # Debug mode
-HUGGINGFACE_MODEL = "..."            # AI model to use
+GOOGLE_API_KEY = ""                  # Gemini API key (get free at Google AI Studio)
 MAX_HISTORY_MESSAGES = 8             # Conversation context size
-POLARITY_POSITIVE_THRESHOLD = 0.1    # Emotion detection threshold
 ```
 
 ## Environment Variables
@@ -173,9 +171,8 @@ POLARITY_POSITIVE_THRESHOLD = 0.1    # Emotion detection threshold
 Create a `.env` file (copy from `.env.example`):
 
 ```env
-HUGGINGFACE_API_KEY=your_key_here
+GOOGLE_API_KEY=your_key_here
 FLASK_DEBUG=false
-FLASK_PORT=8000
 ```
 
 ## Development
