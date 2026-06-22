@@ -28,6 +28,7 @@ def process_message(user_message, history=None):
         if detect_crisis_intent(user_message):
             return {"reply": CRISIS_RESPONSE["reply"], "emotion": "distressed", "is_crisis": True}
         # Return AI response with sanitization
+        print(f"[AI] Using Gemini response")
         return {"reply": sanitize_reply(ai_response), "emotion": emotion, "is_crisis": False}
     
     # If AI fails, check for crisis keywords
@@ -36,6 +37,7 @@ def process_message(user_message, history=None):
         return {"reply": safety["reply"], "emotion": "distressed", "is_crisis": True}
     
     # If everything is ok, return a generic supportive fallback response
+    print(f"[FALLBACK] Gemini didn't respond, using fallback")
     return {"reply": sanitize_reply(get_fallback_response(emotion)), "emotion": emotion, "is_crisis": False}
 
 def get_ai_response(msg, emotion, hist):
@@ -48,7 +50,7 @@ def get_ai_response(msg, emotion, hist):
         res = requests.post(
             f"{GEMINI_URL}?key={GOOGLE_API_KEY}",
             json={"contents": [{"parts": [{"text": _build_prompt(msg, emotion, hist)}]}]},
-            timeout=30
+            timeout=60
         )
         res.raise_for_status()
         result = res.json()
@@ -94,7 +96,7 @@ def detect_crisis_intent(msg):
         res = requests.post(
             f"{GEMINI_URL}?key={GOOGLE_API_KEY}",
             json={"contents": [{"parts": [{"text": f"Is the person expressing intent to harm themselves or commit suicide? Message: '{msg}'\n\nAnswer only 'yes' or 'no'."}]}]},
-            timeout=15
+            timeout=45
         )
         res.raise_for_status()
         result = res.json()
