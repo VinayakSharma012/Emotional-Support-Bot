@@ -61,9 +61,17 @@ def chat():
         return jsonify({"error": ERROR_GENERIC}), 500
 
 if __name__ == "__main__":
+    # On deploy services (like Render) provide a PORT environment variable.
+    # Prefer that when available, otherwise fall back to FLASK_PORT from config
+    port = int(os.getenv("PORT") or FLASK_PORT)
+
+    # Show whether the Gemini key is configured (without printing the key)
+    gemini_present = bool(os.getenv("GOOGLE_API_KEY"))
+    print(f"Starting Emotional Support Bot on 0.0.0.0:{port} | Gemini key set: {gemini_present}")
+
     app.run(
         host="0.0.0.0",
-        port=FLASK_PORT,
+        port=port,
         debug=FLASK_DEBUG
     )
 

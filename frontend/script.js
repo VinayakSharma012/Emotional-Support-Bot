@@ -6,7 +6,6 @@ const userInput = document.getElementById("userInput");
 const sendBtn = document.getElementById("sendBtn");
 const emotionBadge = document.getElementById("emotionBadge");
 const chatForm = document.getElementById("chatForm");
-const quickActionBtns = document.querySelectorAll(".quick-action-btn");
 const conversationHistory = [];
 
 const isMobile = navigator.maxTouchPoints > 0 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -35,15 +34,6 @@ function setupEventListeners() {
 
     userInput.addEventListener("input", () => {
         resizeTextarea();
-    });
-
-    quickActionBtns.forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const action = btn.getAttribute("data-action");
-            userInput.value = action;
-            resizeTextarea();
-            sendMessage();
-        });
     });
 }
 

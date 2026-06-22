@@ -302,55 +302,7 @@ body::after {
     border-color: rgba(248,113,113,0.4);
 }
 
-.chat-intro {
-    padding: 20px 24px;
-    background: var(--bg-main);
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-}
 
-.intro-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.intro-text {
-    font-size: 14px;
-    color: var(--text-soft);
-    line-height: 1.6;
-}
-
-.quick-actions {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 8px;
-}
-
-.quick-action-btn {
-    background: var(--accent-soft);
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.quick-action-btn:hover {
-    background: var(--accent);
-    color: var(--bg-main);
-}
-
-.quick-action-btn:active {
-    transform: scale(0.98);
-}
 
 .chat-messages {
     flex: 1;
@@ -603,24 +555,6 @@ body::after {
         max-width: 85%;
     }
 
-    .chat-intro {
-        padding: 16px;
-    }
-
-    .intro-card {
-        padding: 12px;
-    }
-
-    .quick-actions {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 6px;
-    }
-
-    .quick-action-btn {
-        font-size: 11px;
-        padding: 6px 10px;
-    }
-
     .input-hint {
         display: none;
     }
@@ -710,30 +644,6 @@ body::after {
     .emotion-badge {
         font-size: 11px;
         padding: 4px 10px;
-    }
-
-    .chat-intro {
-        padding: 12px;
-    }
-
-    .intro-card {
-        padding: 12px;
-        gap: 10px;
-    }
-
-    .intro-text {
-        font-size: 13px;
-    }
-
-    .quick-actions {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 6px;
-    }
-
-    .quick-action-btn {
-        font-size: 12px;
-        padding: 10px;
     }
 
     .chat-messages {
