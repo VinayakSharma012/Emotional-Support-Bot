@@ -6,8 +6,8 @@ A professional mental health support chatbot for students with crisis detection,
 
 ✅ **Crisis Detection** - Identifies crisis keywords and provides immediate helpline guidance  
 ✅ **Emotion Analysis** - Detects emotional states (positive, negative, neutral, distressed)  
-✅ **Context-Aware Responses** - Tailored replies for specific topics (crushes, exams, anxiety, etc.)  
-✅ **AI-Powered Replies** - Hugging Face integration for intelligent responses (optional)  
+✅ **Conversation Context** - Uses recent chat history when generating AI replies  
+✅ **AI-Powered Replies** - Groq API integration for intelligent responses (optional)  
 ✅ **Fallback Responses** - Safe, empathetic default messages when AI is unavailable  
 ✅ **Dark Theme UI** - Professional, modern, mobile-responsive interface  
 ✅ **Local & Private** - Run locally for complete privacy and control  
@@ -17,7 +17,7 @@ A professional mental health support chatbot for students with crisis detection,
 - **Frontend:** HTML5, CSS3, Vanilla JavaScript (no frameworks)
 - **Backend:** Python Flask
 - **Sentiment Analysis:** TextBlob
-- **AI Responses:** Hugging Face Inference API (optional)
+- **AI Responses:** Groq API (optional)
 - **Port:** 8000 (configurable)
 
 ## Project Structure
@@ -58,16 +58,18 @@ python -m textblob.download_corpora
 
 ### 2. Configure (Optional)
 
-For AI responses using Google Gemini:
+For AI responses using Groq:
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` and add your Google Gemini API key (get it free at [Google AI Studio](https://aistudio.google.com)):
+Edit `.env` and add your Groq API key:
 
 ```env
-GOOGLE_API_KEY=your_api_key_here
+GROQ_API_KEY=your_api_key_here
+GROQ_MODEL=llama-3.3-70b-versatile
+GROQ_FALLBACK_MODELS=llama-3.3-70b-versatile
 ```
 
 **Note:** Keep `.env` private. It's in `.gitignore`.
@@ -118,6 +120,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+```json
 {
   "reply": "Academic pressure can be really heavy. What's the thing about school or exams that's causing the most stress?",
   "emotion": "negative",
@@ -130,10 +133,10 @@ Content-Type: application/json
 
 The chatbot processes messages in this order:
 
-1. **Safety Check** → Detects crisis keywords, returns helpline info if needed
-2. **Emotion Detection** → Analyzes sentiment (positive/negative/neutral/distressed)
-3. **AI Response** → Uses Google Gemini 2.5 Flash API if key is configured
-4. **Crisis Intent Detection** → AI-based analysis for additional safety
+1. **Emotion Detection** → Analyzes sentiment (positive/negative/neutral/distressed)
+2. **AI Response** → Uses the Groq API if `GROQ_API_KEY` is configured
+3. **Crisis Intent Detection** → AI-based analysis when Groq responds
+4. **Keyword Safety Check** → Detects crisis keywords if AI is unavailable
 5. **Fallback Response** → Safe, supportive default message if AI fails
 6. **Sanitization** → Validates and formats the final reply
 
@@ -162,7 +165,8 @@ All settings are in `config/config.py`:
 ```python
 FLASK_PORT = 8000                    # Server port
 FLASK_DEBUG = False                  # Debug mode
-GOOGLE_API_KEY = ""                  # Gemini API key (get free at Google AI Studio)
+GROQ_API_KEY = ""                    # Groq API key
+GROQ_MODEL = "llama-3.3-70b-versatile" # Groq model name
 MAX_HISTORY_MESSAGES = 8             # Conversation context size
 ```
 
@@ -171,7 +175,9 @@ MAX_HISTORY_MESSAGES = 8             # Conversation context size
 Create a `.env` file (copy from `.env.example`):
 
 ```env
-GOOGLE_API_KEY=your_key_here
+GROQ_API_KEY=your_key_here
+GROQ_MODEL=llama-3.3-70b-versatile
+GROQ_FALLBACK_MODELS=llama-3.3-70b-versatile
 FLASK_DEBUG=false
 ```
 

@@ -504,6 +504,10 @@ body::after {
     cursor: not-allowed;
 }
 
+.send-button.loading .send-icon {
+    display: none;
+}
+
 .send-button.loading::after {
     content: '';
     display: inline-block;
@@ -748,29 +752,6 @@ body::after {
 
     .header-title {
         font-size: 14px;
-    }
-
-    .chat-intro {
-        padding: 10px;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .intro-card {
-        padding: 10px;
-    }
-
-    .intro-text {
-        font-size: 12px;
-    }
-
-    .quick-actions {
-        gap: 5px;
-    }
-
-    .quick-action-btn {
-        font-size: 11px;
-        padding: 8px;
-        border-radius: 6px;
     }
 
     .chat-messages {

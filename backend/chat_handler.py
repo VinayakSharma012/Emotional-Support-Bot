@@ -1,71 +1,94 @@
-# ============================================================
-# Message Processing: Emotion Detection → AI Response → Crisis Detection
-# ============================================================
-
-import os
-import sys
 import requests
 from backend.safety import safety_check, CRISIS_RESPONSE
 from backend.emotion import detect_emotion
 from backend.responses import get_fallback_response
 from backend.sanitizer import sanitize_reply
-from config.config import GOOGLE_API_KEY
+from config.config import GROQ_API_KEY, GROQ_FALLBACK_MODELS, GROQ_MODEL
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "").strip()
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+
+def _groq_models():
+    return list(dict.fromkeys([GROQ_MODEL, *GROQ_FALLBACK_MODELS]))
+
+
+def _post_groq(messages, temperature, timeout, model):
+    return requests.post(
+        GROQ_URL,
+        headers={
+            "Authorization": f"Bearer {GROQ_API_KEY}",
+            "Content-Type": "application/json",
+        },
+        json={"model": model, "messages": messages, "temperature": temperature},
+        timeout=timeout,
+    )
+
+
+def _log_groq_error(error, model):
+    response = getattr(error, "response", None)
+    if response is None:
+        print(f"[GROQ] {model} request failed: {str(error)[:120]}")
+        return
+
+    detail = response.text.strip().replace("\n", " ")[:250]
+    print(f"[GROQ] {model} returned {response.status_code}: {detail}")
+
+
+def _is_auth_or_billing_error(error):
+    response = getattr(error, "response", None)
+    return response is not None and response.status_code in {401, 403}
+
 
 def process_message(user_message, history=None):
-    # Main function: processes user message and returns bot response
-    # 1. Detect user's emotion (positive/negative/neutral/distressed)
     emotion = detect_emotion(user_message)
-    # 2. Try to get AI response from Gemini API
     ai_response = get_ai_response(user_message, emotion, history or [])
-    
+
     if ai_response:
-        # If we got AI response, check if it's a crisis situation
         if detect_crisis_intent(user_message):
             return {"reply": CRISIS_RESPONSE["reply"], "emotion": "distressed", "is_crisis": True}
-        # Return AI response with sanitization
-        print(f"[AI] Using Gemini response")
+        print(f"[AI] Using Groq response")
         return {"reply": sanitize_reply(ai_response), "emotion": emotion, "is_crisis": False}
-    
-    # If AI fails, check for crisis keywords
+
     safety = safety_check(user_message)
     if safety["is_crisis"]:
         return {"reply": safety["reply"], "emotion": "distressed", "is_crisis": True}
-    
-    # If everything is ok, return a generic supportive fallback response
-    print(f"[FALLBACK] Gemini didn't respond, using fallback")
+
+    print(f"[FALLBACK] Groq didn't respond, using fallback")
     return {"reply": sanitize_reply(get_fallback_response(emotion)), "emotion": emotion, "is_crisis": False}
 
+
 def get_ai_response(msg, emotion, hist):
-    # Call Google Gemini API to get intelligent AI response
-    # Skip if API key is not configured
-    if not GOOGLE_API_KEY:
-        return None
-    try:
-        # Send message to Gemini API with context
-        res = requests.post(
-            f"{GEMINI_URL}?key={GOOGLE_API_KEY}",
-            json={"contents": [{"parts": [{"text": _build_prompt(msg, emotion, hist)}]}]},
-            timeout=60
-        )
-        res.raise_for_status()
-        result = res.json()
-        # Extract AI response from API result
-        if "candidates" in result and result["candidates"]:
-            text = result["candidates"][0].get("content", {}).get("parts", [{}])[0].get("text", "")
-            return _clean_reply(text) if text else None
-        return None
-    except:
-        # If API fails, return None (will use fallback)
+    if not GROQ_API_KEY:
         return None
 
+    messages = [
+        {
+            "role": "system",
+            "content": "You are a compassionate support chatbot. Never diagnose or prescribe.",
+        },
+        {"role": "user", "content": _build_prompt(msg, emotion, hist)},
+    ]
+
+    for model in _groq_models():
+        for attempt in range(2):
+            try:
+                res = _post_groq(messages, temperature=0.7, timeout=90, model=model)
+                res.raise_for_status()
+                result = res.json()
+                text = result.get("choices", [{}])[0].get("message", {}).get("content", "")
+                if text:
+                    return _clean_reply(text)
+            except Exception as e:
+                _log_groq_error(e, model)
+                if _is_auth_or_billing_error(e):
+                    return None
+                if attempt == 0:
+                    print(f"[RETRY] Retrying Groq model {model}...")
+
+    return None
+
+
 def _build_prompt(msg, emotion, hist):
-    # Build the prompt for AI to generate empathetic response
-    # Include recent conversation history to maintain context
     conv = "\n".join([f"{'User' if i['role']=='user' else 'Bot'}: {i['content']}" for i in hist[-4:]]) or "Start of conversation"
     return f"""You are a compassionate support chatbot. Respond warmly and empathetically.
 - Validate their feelings
@@ -79,30 +102,34 @@ Recent chat: {conv}
 User: {msg}
 Bot:"""
 
+
 def _clean_reply(text):
-    # Remove unwanted markers and extra whitespace from AI response
     cleaned = text.strip() if text else ""
     for marker in ["<|user|>", "<|system|>", "User:", "Assistant:", "\n\n"]:
         if marker in cleaned:
             cleaned = cleaned.split(marker, 1)[0].strip()
     return cleaned.strip("\"' ")
 
+
 def detect_crisis_intent(msg):
-    # Use AI to detect if user is expressing intent to harm themselves
-    if not GOOGLE_API_KEY:
+    if not GROQ_API_KEY:
         return False
     try:
-        # Ask Gemini API to analyze if this is a crisis message
-        res = requests.post(
-            f"{GEMINI_URL}?key={GOOGLE_API_KEY}",
-            json={"contents": [{"parts": [{"text": f"Is the person expressing intent to harm themselves or commit suicide? Message: '{msg}'\n\nAnswer only 'yes' or 'no'."}]}]},
-            timeout=45
+        res = _post_groq(
+            [
+                {"role": "system", "content": "Answer only yes or no."},
+                {
+                    "role": "user",
+                    "content": f"Is the person expressing intent to harm themselves or commit suicide? Message: '{msg}'",
+                },
+            ],
+            temperature=0,
+            timeout=45,
+            model=_groq_models()[0],
         )
         res.raise_for_status()
         result = res.json()
-        text = result.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "").lower()
+        text = result.get("choices", [{}])[0].get("message", {}).get("content", "").lower()
         return "yes" in text
-    except:
-        # If detection fails, assume it's safe
+    except Exception:
         return False
-

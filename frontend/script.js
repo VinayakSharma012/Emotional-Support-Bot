@@ -106,62 +106,30 @@ function rememberConversation(userMessage, botReply) {
 }
 
 function addUserMessage(message, timestamp = null) {
-    const messageDiv = document.createElement("div");
-    messageDiv.className = "message user-message";
-
-    if (!timestamp) {
-        timestamp = new Date().toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-        });
-    }
-
-    messageDiv.innerHTML = `
-        ${escapeHtml(message)}
-        <span class="message-timestamp">${timestamp}</span>
-    `;
-
-    chatMessages.appendChild(messageDiv);
-    chatMessages.scrollIntoView({ behavior: "smooth", block: "end" });
+    addMessage(message, "user-message", timestamp);
 }
 
 function addBotMessage(message, timestamp = null) {
-    const messageDiv = document.createElement("div");
-    messageDiv.className = "message bot-message";
-
-    if (!timestamp) {
-        timestamp = new Date().toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-        });
-    }
-
-    messageDiv.innerHTML = `
-        ${escapeHtml(message)}
-        <span class="message-timestamp">${timestamp}</span>
-    `;
-
-    chatMessages.appendChild(messageDiv);
-    chatMessages.scrollIntoView({ behavior: "smooth", block: "end" });
+    addMessage(message, "bot-message", timestamp);
 }
 
 function addCrisisMessage(message, timestamp = null) {
-    const messageDiv = document.createElement("div");
-    messageDiv.className = "message bot-message crisis-message";
+    addMessage(message, "bot-message crisis-message", timestamp);
+}
 
-    if (!timestamp) {
-        timestamp = new Date().toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-        });
-    }
+function addMessage(message, className, timestamp = null) {
+    const messageDiv = document.createElement("div");
+    messageDiv.className = `message ${className}`;
+
+    const displayTime = timestamp || new Date().toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+    });
 
     messageDiv.innerHTML = `
         ${escapeHtml(message)}
-        <span class="message-timestamp">${timestamp}</span>
+        <span class="message-timestamp">${displayTime}</span>
     `;
 
     chatMessages.appendChild(messageDiv);
