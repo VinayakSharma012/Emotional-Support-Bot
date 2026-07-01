@@ -1,7 +1,7 @@
 import requests
 from backend.safety import safety_check, CRISIS_RESPONSE
 from backend.emotion import detect_emotion
-from backend.responses import get_fallback_response
+from backend.responses import get_context_aware_response, get_fallback_response
 from backend.sanitizer import sanitize_reply
 from config.config import GROQ_API_KEY, GROQ_FALLBACK_MODELS, GROQ_MODEL
 
@@ -40,18 +40,25 @@ def _is_auth_or_billing_error(error):
 
 
 def process_message(user_message, history=None):
+    history = history or []
+
+    safety = safety_check(user_message)
+    if safety["is_crisis"]:
+        return {"reply": safety["reply"], "emotion": "distressed", "is_crisis": True}
+
     emotion = detect_emotion(user_message)
-    ai_response = get_ai_response(user_message, emotion, history or [])
+
+    context_response = get_context_aware_response(user_message, history)
+    if context_response:
+        return {"reply": sanitize_reply(context_response), "emotion": emotion, "is_crisis": False}
+
+    ai_response = get_ai_response(user_message, emotion, history)
 
     if ai_response:
         if detect_crisis_intent(user_message):
             return {"reply": CRISIS_RESPONSE["reply"], "emotion": "distressed", "is_crisis": True}
         print(f"[AI] Using Groq response")
         return {"reply": sanitize_reply(ai_response), "emotion": emotion, "is_crisis": False}
-
-    safety = safety_check(user_message)
-    if safety["is_crisis"]:
-        return {"reply": safety["reply"], "emotion": "distressed", "is_crisis": True}
 
     print(f"[FALLBACK] Groq didn't respond, using fallback")
     return {"reply": sanitize_reply(get_fallback_response(emotion)), "emotion": emotion, "is_crisis": False}
@@ -92,7 +99,8 @@ def _build_prompt(msg, emotion, hist):
     conv = "\n".join([f"{'User' if i['role']=='user' else 'Bot'}: {i['content']}" for i in hist[-4:]]) or "Start of conversation"
     return f"""You are a compassionate support chatbot. Respond warmly and empathetically.
 - Validate their feelings
-- Ask one helpful follow-up question
+- First answer the user's explicit question or request with practical, relevant information
+- Then ask at most one helpful follow-up question
 - Keep response under 60 words
 - Never diagnose or prescribe
 - For crisis, encourage professional help
